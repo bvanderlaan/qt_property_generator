@@ -2,8 +2,8 @@
 This is a tool that will read a C++ header file for Q_PROPERTY entries then generate the required getters/setters and signals needed
 to implement said property.
 
-to use the tool in a terimal type:
-> $ ruby generate_qt_property.rb <header file>
+to use the tool in a termial type:
+> $ ruby generate_qt_property.rb *header file*
 
 ## Example
 > $ ruby generate_qt_property.rb MyTestClass.hpp
