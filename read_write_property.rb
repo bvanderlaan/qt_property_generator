@@ -9,7 +9,7 @@ class ReadWriteProperty < ReadOnlyProperty
 	end
 
 	def definitions
-		code = "\t/// The #{@name.capitalize} Property\n"
+		code = "\t/// The #{@name.capitalize_first} Property\n"
 		code += self.getter_definition	
 		code += self.setter_definition	
 		code += self.notifier_definition
@@ -22,6 +22,10 @@ class ReadWriteProperty < ReadOnlyProperty
 		code = super
 		code += self.setter_source
 		return code
+	end
+
+	def property_macro
+		return "\tQ_PROPERTY( #{@type} #{@name} READ #{@getter} WRITE #{@setter} NOTIFY #{@notifier} )"
 	end
 
 	protected
