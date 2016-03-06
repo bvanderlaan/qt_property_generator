@@ -23,7 +23,28 @@ require_relative 'insert_definition'
 require_relative 'user_options'
 
 if (ARGV.include?("--help"))
-	puts "HELP!"
+	puts "Generate Properties (c)2016 ImaginativeThinking"
+	puts "==============================================="
+	puts "This tool reads the given header file looking up each"
+	puts "Q_PROPERTY macro. It will generate the required getters,"
+	puts "setters, signals, and member variables to implement the"
+	puts "found properties."
+	puts ""
+	puts "For more information see:"
+	puts "\thttps://github.com/bvanderlaan/qt_property_generator"
+	puts ""
+	puts "Usage:"
+	puts "\t genprops.rb <header file> [--source.ext=<extension>]"
+	puts ""
+	puts "<header file>              The path/name to a header file to read/write to"
+	puts "--source.ext=<extension>   Optional: override the default source file extension"
+	puts ""
+	puts ""
+	puts "Examples:"
+	puts "\t genprops.rb MyClass.hpp"
+	puts "\t genprops.rb MyClass.hxx --source.ext=cxx"
+	puts ""
+	puts ""
 	exit 0
 end
 
