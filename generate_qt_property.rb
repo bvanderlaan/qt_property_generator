@@ -18,6 +18,8 @@
 require_relative 'read_only_property'
 require_relative 'read_write_property'
 require_relative 'existing_properties'
+require_relative 'append_source'
+require_relative 'insert_definition'
 
 if (ARGV.include?("--help"))
 	puts "HELP!"
@@ -32,24 +34,28 @@ if (ARGV.count == 0)
 end
 
 begin
-	existing_properties = ExistingProperties.new( ARGV[0] )
-rescue ArgumentError => file_name
-	puts "Error: The given file [#{file_name}] does not exist."
+	existing_properties = ExistingProperties.new(ARGV)
+rescue FileNotFoundError => file_name
+	puts "ERROR: The given file [#{file_name}] does not exist."
 	puts "Try the following for more help:"
 	puts "$ ruby #{$0} --help"
 	exit -2
 end
 
-properties_definition = "\n" + existing_properties.all_definitions_s
+begin
+	InsertDefinition.new( existing_properties )
+rescue FileNotFoundError => file_name
+	puts "ERROR: The given file [#{file_name}] does not exist."
+	puts "Try the following for more help:"
+	puts "$ ruby #{$0} --help"
+	exit -3
+end	
 
-definition_file_content = File.read("#{existing_properties.class_name}#{existing_properties.header_ext}")
-definition_file_content = definition_file_content.insert( ( definition_file_content.rindex(/};/) - 1), "\n#{properties_definition}" )
-
-File.open("#{existing_properties.class_name}#{existing_properties.header_ext}", 'w') do |file|
-	file.write( definition_file_content ) 
-end
-
-File.open( "#{existing_properties.class_name}.cpp", 'a' ) do |f|
-	f.puts "\n\n"
-	f.puts existing_properties.all_source_s
-end
+begin
+	AppendSource.new( existing_properties )
+rescue FileNotFoundError => file_name
+	puts "ERROR: The given file [#{file_name}] does not exist."
+	puts "Try the following for more help:"
+	puts "$ ruby #{$0} --help"
+	exit -3
+end	

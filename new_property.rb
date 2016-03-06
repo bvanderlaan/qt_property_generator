@@ -25,12 +25,13 @@ class String
 end
 
 class NewProperty
-	attr_reader :name, :type, :class_name
+	attr_reader :class_name
 
 	def initialize(args)
 		if(args.count > 0)
 			@read_only = false
 			@class_name = File.basename(args[0],File.extname(args[0]))	
+			@property = nil
 
 			args.delete_at(0)
 			args.each do |arg|
@@ -42,22 +43,44 @@ class NewProperty
 					@type = parts[1]
 				end
 			end
-		end
-	end
 
-	def read_only?
-		@read_only
+			raise ArgumentError, "Expected arguments missing."  unless( valid? )
+			create_property
+		end
 	end
 
 	def valid?
 		return ( not @name.nil? and not @type.nil? )
 	end
 
-	def property
-		if ( @read_only )
-			return ReadOnlyProperty.new( @class_name, @type, @name, "get#{@name.capitalize_first}", "#{@name.uncapitalize}Changed" )
-		else
-			return ReadWriteProperty.new( @class_name, @type, @name, "get#{@name.capitalize_first}", "set#{@name.capitalize_first}", "#{@name.uncapitalize}Changed" )
+	def source
+		@property ? @property.source : ""
+	end
+
+	def definitions
+		@property ? @property.definitions : ""
+	end
+
+	def property_macro
+		@property ? @property.property_macro : ""
+	end
+
+	def header_ext
+		".hpp"
+	end
+
+	def source_ext
+		".cpp"
+	end
+
+private
+	def create_property
+		if ( valid? )
+			if ( @read_only )
+				@property = ReadOnlyProperty.new( @class_name, @type, @name, "get#{@name.capitalize_first}", "#{@name.uncapitalize}Changed" )
+			else
+				@property = ReadWriteProperty.new( @class_name, @type, @name, "get#{@name.capitalize_first}", "set#{@name.capitalize_first}", "#{@name.uncapitalize}Changed" )
+			end
 		end
 	end
 end

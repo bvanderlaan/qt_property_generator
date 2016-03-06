@@ -15,34 +15,40 @@
  limitations under the License.
 =end
 
+class FileNotFoundError < IOError
+end
 class ExistingProperties
 	attr_reader :all_properties, :class_name, :header_ext
 
-	def initialize( header_file )
-		@source_header_file = header_file
+	def initialize( args )
+		@source_header_file = args[0]
 		@class_name = File.basename(@source_header_file,File.extname(@source_header_file))
 		@header_ext = File.extname(@source_header_file)
 		@all_properties = Array.new
 
-		raise ArgumentError, "#{header_file}"  unless File.file?(@source_header_file)
+		raise FileNotFoundError, "#{@source_header_file}"  unless File.file?(@source_header_file)
 
 		read_all_existing_properties
 	end
 
-	def all_definitions_s
-		properties_definition = ""
+	def definitions
+		properties_definition = "\n"
 		@all_properties.each do |property|
 			properties_definition += property.definitions
 		end
 		return properties_definition
 	end
 
-	def all_source_s
+	def source
 		properties_source = ""
 		@all_properties.each do |property|
 			properties_source += property.source
 		end
 		return properties_source
+	end
+
+	def source_ext
+		".cpp"
 	end
 
 private
