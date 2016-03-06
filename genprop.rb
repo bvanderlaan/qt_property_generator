@@ -20,6 +20,7 @@ require_relative 'read_write_property'
 require_relative 'new_property'
 require_relative 'append_source'
 require_relative 'insert_definition'
+require_relative 'new_property_user_options'
 
 if (ARGV.include?("--help"))
 	puts "HELP!"
@@ -34,7 +35,7 @@ if (ARGV.count < 2)
 end
 
 begin
-	new_property = NewProperty.new(ARGV)
+	new_property = NewProperty.new( NewPropertyUserOptions.new(ARGV) )
 rescue ArgumentError
 	puts "ERROR: You provided invalid parameters."
 	puts "Try the following for more help:"

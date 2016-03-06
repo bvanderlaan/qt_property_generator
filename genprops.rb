@@ -20,6 +20,7 @@ require_relative 'read_write_property'
 require_relative 'existing_properties'
 require_relative 'append_source'
 require_relative 'insert_definition'
+require_relative 'user_options'
 
 if (ARGV.include?("--help"))
 	puts "HELP!"
@@ -34,7 +35,7 @@ if (ARGV.count == 0)
 end
 
 begin
-	existing_properties = ExistingProperties.new(ARGV)
+	existing_properties = ExistingProperties.new( UserOptions.new(ARGV) )
 rescue FileNotFoundError => file_name
 	puts "ERROR: The given file [#{file_name}] does not exist."
 	puts "Try the following for more help:"

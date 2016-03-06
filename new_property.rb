@@ -25,28 +25,20 @@ class String
 end
 
 class NewProperty
-	attr_reader :class_name
+	attr_reader :class_name, :header_ext, :source_ext
 
 	def initialize(args)
-		if(args.count > 0)
-			@read_only = false
-			@class_name = File.basename(args[0],File.extname(args[0]))	
-			@property = nil
+		@read_only = false
+		@class_name = args.class_name
+		@property = nil
+		@read_only = args.read_only?
+		@name = args.name
+		@type = args.type
+		@header_ext = args.header_extension
+		@source_ext = args.source_extension
 
-			args.delete_at(0)
-			args.each do |arg|
-				if ( arg == "--readonly" )
-					@read_only = true
-				elsif ( arg.include?(":") )
-					parts = arg.split(":")
-					@name = parts[0]
-					@type = parts[1]
-				end
-			end
-
-			raise ArgumentError, "Expected arguments missing."  unless( valid? )
-			create_property
-		end
+		raise ArgumentError, "Expected arguments missing."  unless( valid? )
+		create_property
 	end
 
 	def valid?
@@ -63,14 +55,6 @@ class NewProperty
 
 	def property_macro
 		@property ? @property.property_macro : ""
-	end
-
-	def header_ext
-		".hpp"
-	end
-
-	def source_ext
-		".cpp"
 	end
 
 private

@@ -18,12 +18,13 @@
 class FileNotFoundError < IOError
 end
 class ExistingProperties
-	attr_reader :all_properties, :class_name, :header_ext
+	attr_reader :class_name, :header_ext, :source_ext
 
 	def initialize( args )
-		@source_header_file = args[0]
+		@source_header_file = args.header_file_name
 		@class_name = File.basename(@source_header_file,File.extname(@source_header_file))
 		@header_ext = File.extname(@source_header_file)
+		@source_ext = args.source_extension
 		@all_properties = Array.new
 
 		raise FileNotFoundError, "#{@source_header_file}"  unless File.file?(@source_header_file)
@@ -45,10 +46,6 @@ class ExistingProperties
 			properties_source += property.source
 		end
 		return properties_source
-	end
-
-	def source_ext
-		".cpp"
 	end
 
 private
