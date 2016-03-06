@@ -1,75 +1,55 @@
+=begin
+
+ Copyright 2016 ImaginativeThinking
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+=end
+
 require_relative 'read_only_property'
 require_relative 'read_write_property'
+require_relative 'existing_properties'
 
-def property_parser( q_property_string, class_name )
-	property_object = nil
-	property_details = q_property_string.lstrip.split(" ")
-	property_details.delete_at(0)
-	property_details.pop
-
-	if (property_details.count >= 6)
-		type = property_details[0]
-		name = property_details[1]
-		getter = property_details[3]
-		if property_details[4] == "WRITE"
-			setter = property_details[5]
-		else
-			notifier = property_details[5]
-		end
-		if (property_details.count >= 8)
-			notifier = property_details[7]
-		end
-
-		if q_property_string.include? "WRITE"
-			property_object = ReadWriteProperty.new( class_name, type, name, getter, setter, notifier )
-		else
-			property_object = ReadOnlyProperty.new( class_name, type, name, getter, notifier )
-		end
-	end
-	return property_object
+if (ARGV.include?("--help"))
+	puts "HELP!"
+	exit 0
 end
 
 if (ARGV.count == 0)
-	puts "You need to provide a header file to read from"
+	puts "ERROR: You need to provide a header file to read from."
+	puts "Try the following for more help:"
+	puts "$ ruby #{$0} --help"
 	exit -1
 end
 
-
-source_header_file = ARGV[0]
-
-if not File.file?(source_header_file)
-	puts "The given file [#{source_header_file}] does not exist"
+begin
+	existing_properties = ExistingProperties.new( ARGV[0] )
+rescue ArgumentError => file_name
+	puts "Error: The given file [#{file_name}] does not exist."
+	puts "Try the following for more help:"
+	puts "$ ruby #{$0} --help"
 	exit -2
 end
 
-all_properties = Array.new
-class_name = File.basename(source_header_file,File.extname(source_header_file))
-definition_file_content = ""
+properties_definition = "\n" + existing_properties.all_definitions_s
 
-File.open( source_header_file ).each do |line|
-	definition_file_content << line
-	if line.include? "Q_PROPERTY"
-		property_object = property_parser( line, class_name )
-		if property_object
-			all_properties.push( property_object )
-		end
-	end
+definition_file_content = File.read("#{existing_properties.class_name}#{existing_properties.header_ext}")
+definition_file_content = definition_file_content.insert( ( definition_file_content.rindex(/};/) - 1), "\n#{properties_definition}" )
+
+File.open("#{existing_properties.class_name}#{existing_properties.header_ext}", 'w') do |file|
+	file.write( definition_file_content ) 
 end
 
-File.open( "#{class_name}.cpp", 'a' ) do |f|
-	f.puts "\n"
-	all_properties.each do |property|
-		f.puts property.source
-	end
+File.open( "#{existing_properties.class_name}.cpp", 'a' ) do |f|
+	f.puts "\n\n"
+	f.puts existing_properties.all_source_s
 end
-
-properties_definition = "\n"
-all_properties.each do |property|
-	properties_definition += property.definitions
-end
-
-File.open("#{class_name}.hpp", 'w') do |file|
-	file.write( definition_file_content.insert( ( definition_file_content.rindex(/};/) - 1), "\n#{properties_definition}" ) ) 
-end
-
-
