@@ -23,7 +23,33 @@ require_relative 'insert_definition'
 require_relative 'new_property_user_options'
 
 if (ARGV.include?("--help"))
-	puts "HELP!"
+	puts "Generate Property (c)2016 ImaginativeThinking"
+	puts "==============================================="
+	puts "This tool generates the required getters,"
+	puts "setters, signals, and member variables to implement"
+	puts "the property."
+	puts ""
+	puts "For more information see:"
+	puts "  https://github.com/bvanderlaan/qt_property_generator"
+	puts ""
+	puts "Usage:"
+	puts "  genprop.rb <class name> <property name>:<type> [--header.ext=<extension>]"
+	puts "                                                 [--source.ext=<extension>]"
+	puts "                                                 [--readonly]"
+	puts ""
+	puts "<class name>               The name of the class this property will be added to"
+	puts "--header.ext=<extension>   Optional: override the default header file extension"
+	puts "--source.ext=<extension>   Optional: override the default source file extension"
+	puts "--readonly                 Optional: Will generate a read-only property"
+	puts ""
+	puts ""
+	puts "Examples:"
+	puts "  genprop.rb MyClass name:QString"
+	puts "  genprop.rb MyClass model:QObject* --readonly"
+	puts "  genprop.rb MyClass name:QString --source.ext=cxx --header.ext=hxx"
+	puts ""
+	puts ""
+	exit 0
 	exit 0
 end
 
