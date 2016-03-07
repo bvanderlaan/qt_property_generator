@@ -47,7 +47,7 @@ private
 
 	def insert_methods( definition_file_content )
 		insertion_point = definition_file_content.rindex(/};/) - 1
-		content_to_insert = "\n\n#{@tab_less_one}public:\n#{@tab}#{@property.method_definition}".gsub!( ";", ";\n#{@tab}").rstrip()
+		content_to_insert = "\n#{@tab_less_one}public:\n#{@tab}#{@property.method_definition}".gsub!( ";", ";\n#{@tab}").rstrip()
 
 		return definition_file_content.insert( insertion_point, content_to_insert )
 	end
