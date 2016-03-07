@@ -61,6 +61,36 @@ The tool by default will implement a read-write property complete with property 
 > $ ruby genprop.rb MyTestClass temp:double --readonly
 
 
+#### Number of Tabs Used
+
+The tool by default will use 1 tab when indenting methods, variables, and macros. The default is geared towards a header file which defines one class with no
+namespace. 
+
+> class MyClass **<- Zero tabs in**
+> {
+> public:	
+>     MyClass() {} **<-- One tabs in**
+> };	
+
+If however you are using namespaces *and* you indent your class definition within the namespace you can override the default number of tabs used
+to properly align the newly added methods, variables, and macros by using the **--tab=<num>** argument.
+
+##### Example
+> $ ruby genprop.rb MyTestClass temp:double --tab=2
+
+The above would align any *private:, public:, signals:* keywords one tab level in and any added macros, signals, methods, or variables **2** tabs in. One would do this if they have their class indented within a signle namespace.
+
+> namespace MyNamespace **<-- Zero tabs in**
+> {
+>    class MyClass **<- One tab in**
+>    {
+>    public:	
+>        MyClass() {} **<-- Two tabs in**
+>    };	
+> }
+
+The number of tabs can not be less then 1 but can be as large as needed. If you enter a tab value of 0 or less the tool will adjust it to 1 tab to ensure the tool can still function.
+
 ### Things to Know
 
 1. Right now if the tool successfully injects code into the header file but fails to inject code into the source file then your header file will indeed be modified. If you run the tool again after fixing whatever blocked the source file you will get duplicate entries in your header file.

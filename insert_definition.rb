@@ -19,6 +19,8 @@ class FileNotFoundError < IOError
 end
 class InsertDefinition
 	def initialize( property )
+		@tab = "\t" * property.number_of_tabs
+		@tab_less_one = "\t" * (property.number_of_tabs - 1)
 		@property = property
 		@definition_file = "#{@property.class_name}#{@property.header_ext}"
 
@@ -44,13 +46,13 @@ private
 
 	def insert_methods( definition_file_content )
 		insertion_point = definition_file_content.rindex(/};/) - 1
-		content_to_insert = "\n\npublic:\n\t#{@property.method_definition}".gsub!( ";", ";\n\t").rstrip()
+		content_to_insert = "\n\n#{@tab_less_one}public:\n#{@tab}#{@property.method_definition}".gsub!( ";", ";\n#{@tab}").rstrip()
 
 		return definition_file_content.insert( insertion_point, content_to_insert )
 	end
 
 	def insert_signals( definition_file_content )
-		content_to_insert = "\n\t#{@property.signal_definition}".gsub!( ";", ";\n\t").rstrip()
+		content_to_insert = "\n#{@tab}#{@property.signal_definition}".gsub!( ";", ";\n#{@tab}").rstrip()
 		insertion_point = definition_file_content.rindex(/};/) - 1
 
 		if ( definition_file_content.include?("protected:") ) 
@@ -62,7 +64,7 @@ private
 		if ( definition_file_content.include?("signals:") )
 			insertion_point = definition_file_content.rindex(/signals:/) + "signals:".length
 		else
-			content_to_insert = "\n\nsignals:#{content_to_insert}"
+			content_to_insert = "\n\n#{@tab_less_one}signals:#{content_to_insert}"
 		end
 
 		return definition_file_content.insert( insertion_point, content_to_insert )
@@ -70,12 +72,12 @@ private
 
 	def insert_variables( definition_file_content )
 		insertion_point = definition_file_content.rindex(/};/) - 1
-		content_to_insert = "\n\t#{@property.variable_definition}".gsub!( ";", ";\n\t").rstrip()
+		content_to_insert = "\n#{@tab}#{@property.variable_definition}".gsub!( ";", ";\n#{@tab}").rstrip()
 
 		if ( definition_file_content.include?("private:") )
 			insertion_point = definition_file_content.rindex(/private:/) + "private:".length
 		else
-			content_to_insert = "\n\nprivate:#{content_to_insert}"
+			content_to_insert = "\n\n#{@tab_less_one}private:#{content_to_insert}"
 		end
 
 		return definition_file_content.insert( insertion_point, content_to_insert )
@@ -87,6 +89,6 @@ class InsertFullDefinition < InsertDefinition
 private
 	def generate_definition
 		definition_file_content = super
-		return definition_file_content.insert( ( definition_file_content.rindex(/Q_OBJECT/) + "Q_OBJECT".length), "\n\t#{@property.property_macro}" )
+		return definition_file_content.insert( ( definition_file_content.rindex(/Q_OBJECT/) + "Q_OBJECT".length), "\n#{@tab}#{@property.property_macro}" )
 	end
 end

@@ -16,10 +16,11 @@
 =end
 
 class UserOptions
-	attr_reader :header_file_name, :source_extension, :header_extension
+	attr_reader :header_file_name, :source_extension, :header_extension, :number_of_tabs
 	def initialize( args )
 		@source_extension = ".cpp"
 		@header_extension = ".hpp"
+		@number_of_tabs = 1
 
 		handle_first_flag( args[0] )
 
@@ -41,6 +42,8 @@ protected
 			handle_source_flags( flag["--source.".length..flag.length] )
 		elsif ( flag.include?("--header.") )
 			handle_header_flags( flag["--header.".length..flag.length] )
+		elsif ( flag.include?("--tab=") )
+			handle_tab_flags( flag["--tab=".length..flag.length] )
 		end
 	end
 
@@ -68,6 +71,10 @@ protected
 		when "ext"
 			@header_extension = value.start_with?(".") ? value : ".#{value}"
 		end
+	end
+
+	def handle_tab_flags(num_of_tabs)
+		@number_of_tabs = num_of_tabs.to_i > 0 ? num_of_tabs.to_i : 1
 	end
 
 end

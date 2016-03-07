@@ -25,7 +25,7 @@ class String
 end
 
 class NewProperty
-	attr_reader :class_name, :header_ext, :source_ext
+	attr_reader :class_name, :header_ext, :source_ext, :number_of_tabs
 
 	def initialize(args)
 		@read_only = false
@@ -36,6 +36,7 @@ class NewProperty
 		@type = args.type
 		@header_ext = args.header_extension
 		@source_ext = args.source_extension
+		@number_of_tabs = args.number_of_tabs
 
 		raise ArgumentError, "Expected arguments missing."  unless( valid? )
 		create_property
