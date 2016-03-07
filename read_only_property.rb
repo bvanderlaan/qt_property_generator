@@ -30,13 +30,16 @@ class ReadOnlyProperty
 		@notifier = notifier
 	end
 
-	def definitions
-		code = "\t/// The #{@name.capitalize_first} Property\n"
-		code += self.getter_definition		
-		code += self.notifier_definition
-		code += self.member_variable_definition
-		code += "\t//////////////////////////////////\n"
-		return code
+	def member_variable_definition
+		"#{@type} m_#{@name};"
+	end
+
+	def notifier_definition
+		"void #{@notifier}( #{@type} #{@name} );"
+	end 
+
+	def method_definition
+		"#{@type} #{@getter}() const;"
 	end
 
 	def source
@@ -45,24 +48,10 @@ class ReadOnlyProperty
 	end
 
 	def property_macro
-		return "\tQ_PROPERTY( #{@type} #{@name} READ #{@getter} NOTIFY #{@notifier} )"
+		return "Q_PROPERTY( #{@type} #{@name} READ #{@getter} NOTIFY #{@notifier} )"
 	end
 
 protected
-	def notifier_definition
-		notifier = "\nsignals:\n"
-		notifier += "    void #{@notifier}( #{@type} #{@name} );\n\n"
-		return notifier
-	end 
-	def member_variable_definition
-		code = "private:\n"
-		code += "    #{@type} m_#{@name};\n\n"
-	end
-	def getter_definition
-		getter = "public:\n"
-		getter += "    #{@type} #{@getter}() const;\n"
-		return getter
-	end
 	def getter_source
 		code = "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 		code += "#{@type} #{@class_name}::#{@getter}() const\n"

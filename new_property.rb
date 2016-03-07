@@ -49,8 +49,16 @@ class NewProperty
 		@property ? @property.source : ""
 	end
 
-	def definitions
-		@property ? @property.definitions : ""
+	def method_definition
+		@property ? @property.method_definition : ""
+	end
+
+	def signal_definition
+		@property ? @property.notifier_definition : ""
+	end
+
+	def variable_definition
+		@property ? @property.member_variable_definition : ""
 	end
 
 	def property_macro

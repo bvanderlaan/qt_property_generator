@@ -32,20 +32,36 @@ class ExistingProperties
 		read_all_existing_properties
 	end
 
-	def definitions
-		properties_definition = "\n"
-		@all_properties.each do |property|
-			properties_definition += property.definitions
-		end
-		return properties_definition
-	end
-
 	def source
 		properties_source = ""
 		@all_properties.each do |property|
 			properties_source += property.source
 		end
 		return properties_source
+	end
+
+	def method_definition
+		properties_definition = ""
+		@all_properties.each do |property|
+			properties_definition += "#{property.method_definition}"
+		end
+		return properties_definition
+	end
+
+	def signal_definition
+		properties_definition = ""
+		@all_properties.each do |property|
+			properties_definition += "#{property.notifier_definition}"
+		end
+		return properties_definition
+	end
+
+	def variable_definition
+		properties_definition = ""
+		@all_properties.each do |property|
+			properties_definition += "#{property.member_variable_definition}"
+		end
+		return properties_definition
 	end
 
 private
