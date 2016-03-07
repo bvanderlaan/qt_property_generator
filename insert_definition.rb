@@ -41,6 +41,7 @@ private
 		definition_file_content = insert_methods( definition_file_content )
 		definition_file_content = insert_signals( definition_file_content )
 		definition_file_content = insert_variables( definition_file_content )
+		definition_file_content = insert_fix_for_class_ending( definition_file_content )
 		return definition_file_content
 	end
 
@@ -81,6 +82,14 @@ private
 		end
 
 		return definition_file_content.insert( insertion_point, content_to_insert )
+	end
+
+	def insert_fix_for_class_ending( definition_file_content )
+		if ( @property.number_of_tabs > 1 )
+			insertion_point = definition_file_content.rindex(/};/) - 1
+			return definition_file_content.insert( insertion_point, "\n" )
+		end
+		return definition_file_content
 	end
 end
 
