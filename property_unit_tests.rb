@@ -64,27 +64,61 @@ class PropertyUnitTests
 		code = "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 		code += "void #{self.class_name}::testGetting#{@property.property_name.capitalize_first}()\n"
 		code += "{\n"
-		code += "    QFAIL(\"BOO\");\n"
+		code += "    #{@property.class_name} cut( #{actual}  );\n"
+	    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected}  );\n"
 		code += "}\n\n"
 
 		unless @property.read_only?
 			code += "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 			code += "void #{self.class_name}::testSetting#{@property.property_name.capitalize_first}()\n"
 			code += "{\n"
-			code += "    QFAIL(\"BOO\");\n"
+			code += "    #{@property.class_name} cut;\n"
+		    code += "    QSignalSpy spy( &cut, SIGNAL(#{@property.signal_name}(#{@property.type}) ) );\n"
+		    code += "    QVERIFY( cut.#{@property.getter_name}().isEmpty() );\n\n"
+		    code += "    cut.#{@property.setter_name}( #{actual} );\n"
+		    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected}  );\n"
+		    code += "    QCOMPARE( spy.count(), 1 );\n"
+		    code += "    QCOMPARE( spy.takeFirst().at(0).toString(), #{expected}  );\n"
 			code += "}\n\n"
 			code += "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 			code += "void #{self.class_name}::testSetting#{@property.property_name.capitalize_first}ToSameValue()\n"
 			code += "{\n"
-			code += "    QFAIL(\"BOO\");\n"
+			code += "    #{@property.class_name} cut( #{actual} );\n"
+		    code += "    QSignalSpy spy( &cut, SIGNAL(#{@property.signal_name}(#{@property.type}) ) );\n"
+		    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected} );\n\n"
+		    code += "    cut.#{@property.setter_name}( #{actual} );\n"
+		    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected} );\n"
+		    code += "    QCOMPARE( spy.count(), 0 );\n"
 			code += "}\n\n"
 		end
 
 		code += "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 		code += "void #{self.class_name}::testToEnsureThatThe#{@property.property_name.capitalize_first}PropertyExsits()\n"
 		code += "{\n"
-		code += "    QFAIL(\"BOO\");\n"
+		code += "    #{@property.class_name} cut;\n\n"
+		code += "    const QMetaObject *metaobject = cut.metaObject();\n"
+     	code += "    int index = metaobject->indexOfProperty( \"#{@property.property_name}\" );\n"
+     	code += "    QVERIFY( index != -1 );\n"
 		code += "}\n\n"
+	end
+
+private
+	def actual
+		case @property.type
+		when "QString", "string", "std:string", "wstring", "std:wstring"
+			return "file"
+		when "int", "uint", "long"
+			return "55"
+		end
+	end
+
+	def expected
+		case @property.type
+		when "QString", "string", "std:string", "wstring", "std:wstring"
+			return "QStringLiteral(\"#{actual}\")"
+		else
+			return actual
+		end
 	end
 
 end

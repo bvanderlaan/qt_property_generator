@@ -72,10 +72,11 @@ class NewProperty
 private
 	def create_property
 		if ( valid? )
+			getter_prefix = @type == "bool" ? "" : "get"
 			if ( @read_only )
-				@property = ReadOnlyProperty.new( @class_name, @type, @property_name, "get#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
+				@property = ReadOnlyProperty.new( @class_name, @type, @property_name, "#{getter_prefix}#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
 			else
-				@property = ReadWriteProperty.new( @class_name, @type, @property_name, "get#{@property_name.capitalize_first}", "set#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
+				@property = ReadWriteProperty.new( @class_name, @type, @property_name, "#{getter_prefix}#{@property_name.capitalize_first}", "set#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
 			end
 		end
 	end
@@ -91,5 +92,21 @@ class TestableNewProperty < NewProperty
 	end
 	def make_unit_tests?
 		@make_unit_tests
+	end
+
+	def type
+		@property ? @property.type : ""
+	end
+
+	def getter_name
+		@property ? @property.getter : ""
+	end
+
+	def signal_name
+		@property ? @proeprty.notifier : ""
+	end
+
+	def setter_name
+		( @read_only && @property ) ? @property.setter : ""
 	end
 end

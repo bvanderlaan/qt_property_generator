@@ -124,7 +124,7 @@ private
 		insertion_point = definition_file_content.rindex(/};/) - 1
 
 		if ( definition_file_content.include?("private slots:") )
-			insertion_point = definition_file_content.rindex(/private slots:/)
+			insertion_point = definition_file_content.rindex(/private slots:/) + "private slots:".length
 		else
 			content_to_insert = "\n#{@tab_less_one}private slots:#{content_to_insert}"	
 		end

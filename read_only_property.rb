@@ -22,6 +22,8 @@ class String
 end
 
 class ReadOnlyProperty
+	attr_reader :type, :getter, :notifier
+	
 	def initialize(class_name,type, name, getter, notifier)
 		@class_name = class_name
 		@type = type
