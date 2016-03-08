@@ -21,6 +21,7 @@ class UserOptions
 		@source_extension = ".cpp"
 		@header_extension = ".hpp"
 		@number_of_tabs = 1
+		@make_unit_tests = false
 
 		handle_first_flag( args[0] )
 
@@ -28,6 +29,10 @@ class UserOptions
 		args.each do |arg|
 			rout_flag_handleing(arg)
 		end
+	end
+
+	def make_unit_tests?
+		@make_unit_tests
 	end
 
 protected
@@ -44,6 +49,8 @@ protected
 			handle_header_flags( flag["--header.".length..flag.length] )
 		elsif ( flag.include?("--tab=") )
 			handle_tab_flags( flag["--tab=".length..flag.length] )
+		elsif ( flag.include?("--test") )
+			@make_unit_tests = true
 		end
 	end
 

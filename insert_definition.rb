@@ -101,3 +101,26 @@ private
 		return definition_file_content.insert( ( definition_file_content.rindex(/Q_OBJECT/) + "Q_OBJECT".length), "\n#{@tab}#{@property.property_macro}" )
 	end
 end
+
+class InsertTestDefinition < InsertDefinition
+private
+	def generate_definition
+		definition_file_content = File.read("#{@definition_file}")
+		definition_file_content = insert_methods( definition_file_content )
+		definition_file_content = insert_fix_for_class_ending( definition_file_content )
+		return definition_file_content
+	end
+
+	def insert_methods( definition_file_content )
+		content_to_insert = "\n#{@tab}#{@property.method_definition}".gsub!( ";", ";\n#{@tab}").rstrip()
+		insertion_point = definition_file_content.rindex(/};/) - 1
+
+		if ( definition_file_content.include?("private slots:") )
+			insertion_point = definition_file_content.rindex(/private slots:/)
+		else
+			content_to_insert = "\n#{@tab_less_one}private slots:#{content_to_insert}"	
+		end
+		
+		return definition_file_content.insert( insertion_point, content_to_insert )
+	end
+end

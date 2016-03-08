@@ -21,6 +21,7 @@ require_relative 'new_property'
 require_relative 'append_source'
 require_relative 'insert_definition'
 require_relative 'new_property_user_options'
+require_relative 'property_unit_tests'
 
 if (ARGV.include?("--help"))
 	puts "Generate Property (c)2016 ImaginativeThinking"
@@ -36,12 +37,14 @@ if (ARGV.include?("--help"))
 	puts "  genprop.rb <class name> <property name>:<type> [--header.ext=<extension>]"
 	puts "                                                 [--source.ext=<extension>]"
 	puts "                                                 [--readonly]"
+	puts "                                                 [--test]"
 	puts ""
 	puts "<class name>               The name of the class this property will be added to"
 	puts "--header.ext=<extension>   Optional: override the default header file extension"
 	puts "--source.ext=<extension>   Optional: override the default source file extension"
 	puts "--readonly                 Optional: Will generate a read-only property"
 	puts "--tab=<num>                Optional: override the default number of tabs used"
+	puts "--test                     Optional: Adds unit tests to cover the new property"
 	puts ""
 	puts ""
 	puts "Examples:"
@@ -49,6 +52,7 @@ if (ARGV.include?("--help"))
 	puts "  genprop.rb MyClass model:QObject* --readonly"
 	puts "  genprop.rb MyClass name:QString --source.ext=cxx --header.ext=hxx"
 	puts "  genprop.rb MyClass name:QString --tab=2"
+	puts "  genprop.rb MyClass name:QString --test"
 	puts ""
 	puts ""
 	exit 0
@@ -88,3 +92,25 @@ rescue FileNotFoundError => file_name
 	puts "$ ruby #{$0} --help"
 	exit -3
 end	
+
+if ( new_property.make_unit_tests? )
+
+	property_unit_tests = PropertyUnitTests.new( new_property )
+	begin
+		InsertTestDefinition.new( property_unit_tests )
+	rescue FileNotFoundError => file_name
+		puts "ERROR: The given file [#{file_name}] does not exist."
+		puts "Try the following for more help:"
+		puts "$ ruby #{$0} --help"
+		exit -3
+	end
+
+	begin
+		AppendSource.new( property_unit_tests )
+	rescue FileNotFoundError => file_name
+		puts "ERROR: The given file [#{file_name}] does not exist."
+		puts "Try the following for more help:"
+		puts "$ ruby #{$0} --help"
+		exit -3
+	end	
+end

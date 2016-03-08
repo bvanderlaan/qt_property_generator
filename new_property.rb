@@ -25,25 +25,33 @@ class String
 end
 
 class NewProperty
-	attr_reader :class_name, :header_ext, :source_ext, :number_of_tabs
+	attr_reader :class_name, :header_ext, :source_ext, :number_of_tabs, :property_name
 
 	def initialize(args)
-		@read_only = false
 		@class_name = args.class_name
 		@property = nil
 		@read_only = args.read_only?
-		@name = args.name
+		@property_name = args.name
 		@type = args.type
 		@header_ext = args.header_extension
 		@source_ext = args.source_extension
 		@number_of_tabs = args.number_of_tabs
+		@make_unit_tests = args.make_unit_tests?
 
 		raise ArgumentError, "Expected arguments missing."  unless( valid? )
 		create_property
 	end
 
 	def valid?
-		return ( not @name.nil? and not @type.nil? )
+		return ( not @property_name.nil? and not @type.nil? )
+	end
+
+	def read_only?
+		@read_only
+	end
+
+	def make_unit_tests?
+		@make_unit_tests
 	end
 
 	def source
@@ -70,9 +78,9 @@ private
 	def create_property
 		if ( valid? )
 			if ( @read_only )
-				@property = ReadOnlyProperty.new( @class_name, @type, @name, "get#{@name.capitalize_first}", "#{@name.uncapitalize}Changed" )
+				@property = ReadOnlyProperty.new( @class_name, @type, @property_name, "get#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
 			else
-				@property = ReadWriteProperty.new( @class_name, @type, @name, "get#{@name.capitalize_first}", "set#{@name.capitalize_first}", "#{@name.uncapitalize}Changed" )
+				@property = ReadWriteProperty.new( @class_name, @type, @property_name, "get#{@property_name.capitalize_first}", "set#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
 			end
 		end
 	end
