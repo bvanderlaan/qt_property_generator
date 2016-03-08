@@ -103,7 +103,7 @@ class TestableNewProperty < NewProperty
 	end
 
 	def signal_name
-		@property ? @proeprty.notifier : ""
+		@property ? @property.notifier : ""
 	end
 
 	def setter_name

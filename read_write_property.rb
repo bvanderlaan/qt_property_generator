@@ -22,6 +22,7 @@ class String
 end
 
 class ReadWriteProperty < ReadOnlyProperty
+	attr_reader :setter
 	def initialize(class_name, type, name, getter, setter, notifier)
 		@class_name = class_name
 		@type = type
