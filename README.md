@@ -66,11 +66,11 @@ The tool by default will implement a read-write property complete with property 
 The tool by default will use 1 tab when indenting methods, variables, and macros. The default is geared towards a header file which defines one class with no
 namespace. 
 
-> class MyClass **<- Zero tabs in**
+> <pre>class MyClass **<- Zero tabs in**
 > {
 > public:	
->     MyClass() {} **<-- One tabs in**
-> };	
+>     \tMyClass() {} **<-- One tabs in**
+> };</pre>	
 
 If however you are using namespaces *and* you indent your class definition within the namespace you can override the default number of tabs used
 to properly align the newly added methods, variables, and macros by using the **--tab=<num>** argument.
@@ -80,14 +80,14 @@ to properly align the newly added methods, variables, and macros by using the **
 
 The above would align any *private:, public:, signals:* keywords one tab level in and any added macros, signals, methods, or variables **2** tabs in. One would do this if they have their class indented within a signle namespace.
 
-> namespace MyNamespace **<-- Zero tabs in**
+> <pre>namespace MyNamespace **<-- Zero tabs in**
 > {
 >    class MyClass **<- One tab in**
 >    {
 >    public:	
 >        MyClass() {} **<-- Two tabs in**
 >    };	
-> }
+> }</pre>
 
 The number of tabs can not be less then 1 but can be as large as needed. If you enter a tab value of 0 or less the tool will adjust it to 1 tab to ensure the tool can still function.
 
@@ -121,16 +121,71 @@ The above command would read the MyTestClass.hpp file and look for all Q_PROPERT
 3. The tool assumes that the source file will have the same name as the header file and that the class name is the same as your file name.
 
 ### Options
+
+#### Source File Extension
 By default the tool assumes your source file will be using the extension *cpp*. If your source file is using another extension, such as *cxx*, you can override the default with the command line flag **--source.ext=*extention***
 
-#### Example
+##### Example
 > $ ruby genprops.rb MyTestClass.hxx --source.ext=cxx
 
 The above would read the MyTestClass.hxx file and inject the required code into the MyTestClass.hxx and MyTestClass.cxx files.
 **Note that the tool uses the header file extension you typed in when you told it what header file to read from.**
+
+#### Number of Tabs Used
+
+The tool by default will use 1 tab when indenting methods, variables, and macros. The default is geared towards a header file which defines one class with no
+namespace. 
+
+> <pre>class MyClass **<- Zero tabs in**
+> {
+> public:	
+>     \tMyClass() {} **<-- One tabs in**
+> };</pre>	
+
+If however you are using namespaces *and* you indent your class definition within the namespace you can override the default number of tabs used
+to properly align the newly added methods, variables, and macros by using the **--tab=<num>** argument.
+
+##### Example
+> $ ruby genprop.rb MyTestClass temp:double --tab=2
+
+The above would align any *private:, public:, signals:* keywords one tab level in and any added macros, signals, methods, or variables **2** tabs in. One would do this if they have their class indented within a signle namespace.
+
+> <pre>namespace MyNamespace **<-- Zero tabs in**
+> {
+>    class MyClass **<- One tab in**
+>    {
+>    public:	
+>        MyClass() {} **<-- Two tabs in**
+>    };	
+> }</pre>
+
+The number of tabs can not be less then 1 but can be as large as needed. If you enter a tab value of 0 or less the tool will adjust it to 1 tab to ensure the tool can still function.
 
 ### Things to Know
 
 1. Right now if the tool successfully injects code into the header file but fails to inject code into the source file then your header file will indeed be modified. If you run the tool again after fixing whatever blocked the source file you will get duplicate entries in your header file.
 
 2. Right now if your using namespaces the tab-ing of the injected code in your header file won't be right. It assumes no namespace when it comes to tabbing so the generated code is only tabbed in once. I want to fix this in a later version as I do use namespaces often.
+
+
+# Install -- Linux
+
+On linux to have it so that you can run the above commands from anywhere you can install a symlink into your path which points to the script.
+
+First find what locations are already in your path:
+
+> $ echo $PATH
+
+You can add a new location or use one of these. I'm going to use an existing location.
+
+I could copy the code into one of those locations or I could setup a symlink, I'm going to show you how to do this with a symlink.
+
+In a terminal navigate to the location you cloned the code to; In my case this is *~/Development/qt_property_generator*
+
+From there type:
+> $ ln -s ~/Development/qt_property_generator/genprop.rb /usr/local/bin/genprop<br/>
+> $ ln -s ~/Development/qt_property_generator/genprops.rb /usr/local/bin/genprops
+
+The above will create two symlinks which point to each of the ruby scripts in a location within my PATH. Notice that my symblinks don't include the file extension so I can now type the following from any location:
+
+> $ ruby genprop --help

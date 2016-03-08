@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 =begin
 
  Copyright 2016 ImaginativeThinking
