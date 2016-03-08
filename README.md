@@ -26,6 +26,8 @@ This will generate the neccissary getter and setter, will define the required si
 
 3. The tool assumes that the header and source files will have the same name as the class name you provided it.
 
+4. If you use the **--test** argument it is assumed that the class that the unit tests will go in is named by convension <className>TestSutie and uses the same file extensions. That is if the class I'm adding a property to is called *MyTestClass.h/MyTestClass.cpp* then I assumed that the class which holds the tests for MyTestClass is called *MyTestClassTestSuite.h/MyTestClassTestSuite.cpp*.
+
 ### Options
 
 #### Source File Extension
@@ -90,6 +92,31 @@ The above would align any *private:, public:, signals:* keywords one tab level i
 > }</pre>
 
 The number of tabs can not be less then 1 but can be as large as needed. If you enter a tab value of 0 or less the tool will adjust it to 1 tab to ensure the tool can still function.
+
+#### Unit Tests
+
+The tool can also be used to auto-generate a number of unit tests for the newly added property. To do this use the optional **--test** argument.
+
+##### Example
+> $ ruby genprop.rb MyTestClass tmep:double --test
+
+The above will generate a few typical unit tests to cover the newly added property. Unit tests will be added to a class called *<className>TestSuite* so for the above example the tool will try to inject the new unit tests into a class called *MyTestClassTestSuite.hpp/.cpp*. It will look for the test suite class in the same directory as MyTestClass.
+
+Note that the unit tests may not compile as the auto generated unit tests will use default constructors when instanshating your class (i.e. MyTestClass) and the properties type class. You may still need to fix up the objects used in the test.
+
+#### Unit Tests Path
+
+Your unit test code may not be within the same directory as your production code. For example you might have put all your unit test code under a sub folder called */unittests*. By default the tool will look in the same directory as the production code (i.e. MyTestClass). to override this you can use the **--test.path=<path>** argument.
+
+##### Example
+> $ ruby genprop.rb MyTestClass tmep:double --test.path=unittest
+
+You can use relative paths or absolute paths. So if your unit tests are at the same level as your producation code in a parallel folder you can use:
+
+> $ ruby genprop.rb MyTestClass tmep:double --test.path=../unittest
+
+Notice that you do not need to use both *--test* and *--test.path=<path>* using the path argument on its own impies that the *--test* argument is to be used.
+
 
 ### Things to Know
 
