@@ -20,11 +20,15 @@ end
 class AppendSource
 	def initialize( property )
 		@property = property
-		@source_file = "#{@property.class_name}#{@property.source_ext}"
+		@source_file = build_source_filename
 
 		raise FileNotFoundError, "#{@source_file}" unless File.file?("#{@source_file}")
 
 		write_out_source
+	end
+protected
+	def build_source_filename
+		"#{@property.class_name}#{@property.source_ext}"
 	end
 
 private
@@ -33,5 +37,12 @@ private
 			f.puts "\n\n"
 			f.puts @property.source
 		end
+	end
+end
+
+class AppendTestSource < AppendSource
+protected
+	def build_source_filename
+		"#{@property.test_path}#{@property.class_name}#{@property.source_ext}"
 	end
 end

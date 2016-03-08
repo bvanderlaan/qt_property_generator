@@ -16,12 +16,13 @@
 =end
 
 class UserOptions
-	attr_reader :header_file_name, :source_extension, :header_extension, :number_of_tabs
+	attr_reader :header_file_name, :source_extension, :header_extension, :number_of_tabs, :test_path
 	def initialize( args )
 		@source_extension = ".cpp"
 		@header_extension = ".hpp"
 		@number_of_tabs = 1
 		@make_unit_tests = false
+		@test_path = ""
 
 		handle_first_flag( args[0] )
 
@@ -51,6 +52,9 @@ protected
 			handle_tab_flags( flag["--tab=".length..flag.length] )
 		elsif ( flag.include?("--test") )
 			@make_unit_tests = true
+			if ( flag.include?("--test.") )
+				handle_test_flags( flag["--test.".length..flag.length] )
+			end
 		end
 	end
 
@@ -82,6 +86,17 @@ protected
 
 	def handle_tab_flags(num_of_tabs)
 		@number_of_tabs = num_of_tabs.to_i > 0 ? num_of_tabs.to_i : 1
+	end
+
+	def handle_test_flags(flag)
+		parts = split_flag(flag, "=", 2)
+		option = parts[0]
+		value = parts[1]
+
+		case option
+		when "path"
+			@test_path = value.end_with?("/") ? value : "#{value}/"
+		end
 	end
 
 end

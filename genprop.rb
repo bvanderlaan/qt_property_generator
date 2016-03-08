@@ -45,7 +45,8 @@ if (ARGV.include?("--help"))
 	puts "--source.ext=<extension>   Optional: override the default source file extension"
 	puts "--readonly                 Optional: Will generate a read-only property"
 	puts "--tab=<num>                Optional: override the default number of tabs used"
-	puts "--test                     Optional: Adds unit tests to cover the new property"
+	puts "--test[.path=<path>]       Optional: Adds unit tests to cover the new property"
+	puts "                           The optional path sufix specifies the test class path"
 	puts ""
 	puts ""
 	puts "Examples:"
@@ -54,6 +55,7 @@ if (ARGV.include?("--help"))
 	puts "  genprop.rb MyClass name:QString --source.ext=cxx --header.ext=hxx"
 	puts "  genprop.rb MyClass name:QString --tab=2"
 	puts "  genprop.rb MyClass name:QString --test"
+	puts "  genprop.rb MyClass name:QString --test.path=../testsuites"
 	puts ""
 	puts ""
 	exit 0
@@ -68,7 +70,7 @@ if (ARGV.count < 2)
 end
 
 begin
-	new_property = NewProperty.new( NewPropertyUserOptions.new(ARGV) )
+	new_property = TestableNewProperty.new( NewPropertyUserOptions.new(ARGV) )
 rescue ArgumentError
 	puts "ERROR: You provided invalid parameters."
 	puts "Try the following for more help:"
@@ -107,7 +109,7 @@ if ( new_property.make_unit_tests? )
 	end
 
 	begin
-		AppendSource.new( property_unit_tests )
+		AppendTestSource.new( property_unit_tests )
 	rescue FileNotFoundError => file_name
 		puts "ERROR: The given file [#{file_name}] does not exist."
 		puts "Try the following for more help:"

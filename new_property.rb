@@ -36,7 +36,6 @@ class NewProperty
 		@header_ext = args.header_extension
 		@source_ext = args.source_extension
 		@number_of_tabs = args.number_of_tabs
-		@make_unit_tests = args.make_unit_tests?
 
 		raise ArgumentError, "Expected arguments missing."  unless( valid? )
 		create_property
@@ -48,10 +47,6 @@ class NewProperty
 
 	def read_only?
 		@read_only
-	end
-
-	def make_unit_tests?
-		@make_unit_tests
 	end
 
 	def source
@@ -83,5 +78,18 @@ private
 				@property = ReadWriteProperty.new( @class_name, @type, @property_name, "get#{@property_name.capitalize_first}", "set#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
 			end
 		end
+	end
+end
+
+class TestableNewProperty < NewProperty
+	attr_reader :test_path
+
+	def initialize(args)
+		super(args)
+		@make_unit_tests = args.make_unit_tests?
+		@test_path = args.test_path
+	end
+	def make_unit_tests?
+		@make_unit_tests
 	end
 end

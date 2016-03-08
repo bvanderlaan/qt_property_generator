@@ -47,6 +47,10 @@ class PropertyUnitTests
 		@property.number_of_tabs
 	end
 
+	def test_path
+		@property.test_path
+	end
+
 	def method_definition
 		code = "void testGetting#{@property.property_name.capitalize_first}();"
 		unless @property.read_only?

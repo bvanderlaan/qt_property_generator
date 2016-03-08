@@ -22,11 +22,15 @@ class InsertDefinition
 		@tab = "\t" * property.number_of_tabs
 		@tab_less_one = "\t" * (property.number_of_tabs - 1)
 		@property = property
-		@definition_file = "#{@property.class_name}#{@property.header_ext}"
+		@definition_file = build_source_filename
 
 		raise FileNotFoundError, "#{@definition_file}" unless File.file?("#{@definition_file}")
 
 		write_out_definition( generate_definition )
+	end
+protected
+	def build_source_filename
+		"#{@property.class_name}#{@property.header_ext}"
 	end
 
 private
@@ -103,6 +107,10 @@ private
 end
 
 class InsertTestDefinition < InsertDefinition
+protected
+	def build_source_filename
+		"#{@property.test_path}#{@property.class_name}#{@property.header_ext}"
+	end
 private
 	def generate_definition
 		definition_file_content = File.read("#{@definition_file}")
