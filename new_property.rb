@@ -22,6 +22,9 @@ class String
   def capitalize_first
   	self[0, 1].upcase + self[1..-1]
   end
+  def downcase_first
+  	self[0, 1].downcase + self[1..-1]
+  end
 end
 
 class NewProperty
@@ -73,10 +76,16 @@ private
 	def create_property
 		if ( valid? )
 			getter_prefix = @type == "bool" ? "" : "get"
-			if ( @read_only )
-				@property = ReadOnlyProperty.new( @class_name, @type, @property_name, "#{getter_prefix}#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
+			if ( @type == "bool" )
+				getter_name = "#{@property_name.downcase_first}"
 			else
-				@property = ReadWriteProperty.new( @class_name, @type, @property_name, "#{getter_prefix}#{@property_name.capitalize_first}", "set#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
+				getter_name = "get#{@property_name.capitalize_first}"
+			end
+
+			if ( @read_only )
+				@property = ReadOnlyProperty.new( @class_name, @type, @property_name, "#{getter_name}", "#{@property_name.uncapitalize}Changed" )
+			else
+				@property = ReadWriteProperty.new( @class_name, @type, @property_name, "#{getter_name}", "set#{@property_name.capitalize_first}", "#{@property_name.uncapitalize}Changed" )
 			end
 		end
 	end
@@ -107,6 +116,6 @@ class TestableNewProperty < NewProperty
 	end
 
 	def setter_name
-		( @read_only && @property ) ? @property.setter : ""
+		( not @read_only && @property ) ? @property.setter : ""
 	end
 end
