@@ -64,30 +64,65 @@ class PropertyUnitTests
 		code = "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 		code += "void #{self.class_name}::testGetting#{@property.property_name.capitalize_first}()\n"
 		code += "{\n"
-		code += "    #{@property.class_name} cut( #{actual}  );\n"
-	    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected}  );\n"
+		if ( is_pointer_type? )
+			code += "    #{@property.type.chomp("*")} data;\n\n"	
+		end
+		code += "    #{@property.class_name} cut( #{value}, this );\n"
+		if ( is_pointer_type? )
+		    code += "    QVERIFY( cut.#{@property.getter_name}() == #{value}  );\n"
+		else
+		    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{value}  );\n"
+		end
 		code += "}\n\n"
 
 		unless @property.read_only?
 			code += "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 			code += "void #{self.class_name}::testSetting#{@property.property_name.capitalize_first}()\n"
 			code += "{\n"
+			if ( is_pointer_type? )
+				code += "    #{@property.type.chomp("*")} data;\n\n"	
+			end
 			code += "    #{@property.class_name} cut;\n"
-		    code += "    QSignalSpy spy( &cut, SIGNAL(#{@property.signal_name}(#{@property.type}) ) );\n"
-		    code += "    QVERIFY( cut.#{@property.getter_name}().isEmpty() );\n\n"
-		    code += "    cut.#{@property.setter_name}( #{actual} );\n"
-		    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected}  );\n"
+			if ( is_pointer_type? )
+		    	code += "    QSignalSpy spy( &cut, SIGNAL( #{@property.signal_name}() ) );\n"
+		    	code += "    QVERIFY( cut.#{@property.getter_name}() == #{default}  );\n\n"
+			else
+		    	code += "    QSignalSpy spy( &cut, SIGNAL( #{@property.signal_name}(#{@property.type}) ) );\n"
+		    	code += "    QCOMPARE( cut.#{@property.getter_name}(), #{default}  );\n\n"
+			end
+		    code += "    cut.#{@property.setter_name}( #{value} );\n\n"
+		    if ( is_pointer_type? )
+			    code += "    QVERIFY( cut.#{@property.getter_name}() == #{value}  );\n"
+			else
+			    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{value}  );\n"
+			end
 		    code += "    QCOMPARE( spy.count(), 1 );\n"
-		    code += "    QCOMPARE( spy.takeFirst().at(0).toString(), #{expected}  );\n"
+		    unless( is_pointer_type? )
+		    	code += "    QCOMPARE( spy.takeFirst().at(0).#{variant_convertion}(), #{value}  );\n"
+		    end
+
 			code += "}\n\n"
 			code += "///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n"
 			code += "void #{self.class_name}::testSetting#{@property.property_name.capitalize_first}ToSameValue()\n"
 			code += "{\n"
-			code += "    #{@property.class_name} cut( #{actual} );\n"
-		    code += "    QSignalSpy spy( &cut, SIGNAL(#{@property.signal_name}(#{@property.type}) ) );\n"
-		    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected} );\n\n"
-		    code += "    cut.#{@property.setter_name}( #{actual} );\n"
-		    code += "    QCOMPARE( cut.#{@property.getter_name}(), #{expected} );\n"
+			if ( is_pointer_type? )
+				code += "    #{@property.type.chomp("*")} data;\n\n"	
+			end
+			code += "    #{@property.class_name} cut( #{value}, this );\n"
+			if ( is_pointer_type? )
+		    	code += "    QSignalSpy spy( &cut, SIGNAL( #{@property.signal_name}() ) );\n"
+		    	code += "    QVERIFY( cut.#{@property.getter_name}() == #{value} );\n\n"
+			else
+		    	code += "    QSignalSpy spy( &cut, SIGNAL( #{@property.signal_name}(#{@property.type}) ) );\n"
+		    	code += "    QCOMPARE( cut.#{@property.getter_name}(), #{value} );\n\n"
+		    end
+		    
+		    code += "    cut.#{@property.setter_name}( #{value} );\n"
+		    if ( is_pointer_type? )
+		    	code += "    QVERIFY( cut.#{@property.getter_name}() == #{value} );\n"
+			else
+		    	code += "    QCOMPARE( cut.#{@property.getter_name}(), #{value} );\n"
+		    end
 		    code += "    QCOMPARE( spy.count(), 0 );\n"
 			code += "}\n\n"
 		end
@@ -103,22 +138,49 @@ class PropertyUnitTests
 	end
 
 private
-	def actual
+	def value
 		case @property.type
 		when "QString", "string", "std:string", "wstring", "std:wstring"
-			return "file"
+			return "QStringLiteral(\"#{@property.property_name.downcase}\")"
 		when "int", "uint", "long"
 			return "55"
+		when "bool"
+			return "true"
+		else
+			if ( @property.type.end_with?("*") )
+				return "&data"
+			end
 		end
 	end
 
-	def expected
+	def default
 		case @property.type
 		when "QString", "string", "std:string", "wstring", "std:wstring"
-			return "QStringLiteral(\"#{actual}\")"
+			return "QStringLiteral(\"\")"
+		when "int", "uint", "long"
+			return "0"
+		when "bool"
+			return "false"
 		else
-			return actual
+			if ( @property.type.end_with?("*") )
+				return "nullptr"
+			end
 		end
+	end
+
+	def variant_convertion
+		case @property.type
+		when "QString", "string", "std:string", "wstring", "std:wstring"
+			return "toString"
+		when "int", "uint", "long"
+			return "toInt"
+		when "bool"
+			return "toBool"
+		end
+	end
+
+	def is_pointer_type?
+		@property.type.end_with?("*")
 	end
 
 end
